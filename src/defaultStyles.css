@@ -1,0 +1,31 @@
+@import '../node_modules/bootstrap-icons/font/bootstrap-icons.css';
+
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+@layer base {
+  body p {
+    @apply text-base;
+  }
+}
+
+
+
+/*   VARIABLES FOR USE IN PLAIN CSS   */
+:root {
+  --color-primary: theme('colors.primary');
+  --color-secondary: theme('colors.secondary');
+  --color-accent: theme('colors.accent');
+  --color-black: theme('colors.black');
+  --color-white: theme('colors.white');
+}
+
+
+
+/*   CUSTOMIZE SCROLLBAR   */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-thumb { z-index: 10; cursor: default; background-color: var(--color-black); width: 5px; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background-color: var(--color-black); }

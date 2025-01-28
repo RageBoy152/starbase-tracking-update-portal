@@ -1,0 +1,28 @@
+{
+  "spots": [
+    {
+      "id": "uuidv4 id here",
+      "objectName": "MB-2 Work Stand 2",
+      "spotType": "ShipWorkStand",
+      "hardwareId": "",
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    }
+  ],
+  "spotTypes": {
+    "ShipWorkStand": {
+      "options": [
+        {
+          "optionName": "hardwareId",
+          "optionValue": ""
+        }
+      ],
+      "supportedHardwareRequirements": {
+        "hardwareType": ["Ship"],
+        "barrels": 6
+      }
+    }
+  }
+}
