@@ -4,76 +4,79 @@
       "id": "uuidv4 id here",
       "objectName": "Ship 34",
       "hardwareType": "Ship",
+      "standId": "",
       "spotId": "id of occupied spot if applicable",
       "position": {
-        "x": 0,
+        "x": 1,
         "y": 0
       }
     }
   ],
   "hardwareTypes": {
     "Ship": {
-      "barrels": 0,
-      "barrelConfig": [
-        {
-          "barrelName": "NC",
+      "options": {
+        "barrels": 0,
+        "barrelConfig": [
+          {
+            "barrelName": "NC",
+            "frwFlap": 0,
+            "frwFlapAerocover": 0,
+            "TPS": 0,
+            "Internal": 0
+          },
+          {
+            "barrelName": "PL",
+            "barrelRings": 3,
+            "TPS": 0,
+            "payloadDoor": 0,
+            "pez": 0
+          },
+          {
+            "barrelName": "FX",
+            "barrelRings": 4,
+            "TPS": 0,
+            "stringers": 0
+          },
+          {
+            "barrelName": "CX",
+            "barrelRings": 3,
+            "TPS": 0,
+            "beeHive": 0,
+            "stringers": 0
+          },
+          {
+            "barrelName": "A2",
+            "barrelRings": 3,
+            "TPS": 0
+          },
+          {
+            "barrelName": "A3",
+            "barrelRings": 4,
+            "TPS": 0,
+            "aftAerocover": 0
+          },
+          {
+            "barrelName": "AX",
+            "barrelRings": 4,
+            "TPS": 0,
+            "aftAerocover": 0,
+            "stringers": 0,
+            "cameras": 0,
+            "aftFloor": 0,
+            "qd": 0
+          }
+        ],
+        "shipConfig": {
           "frwFlap": 0,
-          "frwFlapAerocover": 0,
-          "TPS": 0,
-          "Internal": 0
+          "aftFlap": 0,
+          "racewayCovers": 0,
+          "enginesSea": 0,
+          "enginesVac": 0
         },
-        {
-          "barrelName": "PL",
-          "barrelRings": 3,
-          "TPS": 0,
-          "payloadDoor": 0,
-          "pez": 0
-        },
-        {
-          "barrelName": "FX",
-          "barrelRings": 4,
-          "TPS": 0,
-          "stringers": 0
-        },
-        {
-          "barrelName": "CX",
-          "barrelRings": 3,
-          "TPS": 0,
-          "beeHive": 0,
-          "stringers": 0
-        },
-        {
-          "barrelName": "A2",
-          "barrelRings": 3,
-          "TPS": 0
-        },
-        {
-          "barrelName": "A3",
-          "barrelRings": 4,
-          "TPS": 0,
-          "aftAerocover": 0
-        },
-        {
-          "barrelName": "AX",
-          "barrelRings": 4,
-          "TPS": 0,
-          "aftAerocover": 0,
-          "stringers": 0,
-          "cameras": 0,
-          "aftFloor": 0,
-          "qd": 0
+        "shipState": {
+          "frwFlap": 0,
+          "aftFlap": 0
         }
-      ],
-      "shipConfig": {
-        "frwFlap": 0,
-        "aftFlap": 0,
-        "racewayCovers": 0,
-        "enginesSea": 0,
-        "enginesVac": 0
-      },
-      "shipState": {
-        "frwFlap": 0,
-        "aftFlap": 0
       }
     }
   }

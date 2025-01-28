@@ -10,20 +10,28 @@ import Map from '../components/Map.jsx'
 
 //  Data
 import spots from '../spots.json';
+import hardware from '../hardware.json';
 
 
 
 export default function Console() {
   const [inspectedObject, setInspectedObject] = useState(null);
   
-  const inspectedObjectOptions = inspectedObject ? spots.spotTypes[inspectedObject.spotType].options : null;
+  const inspectedObjectOptions = inspectedObject ? spots.spotTypes[inspectedObject.spotType] ? spots.spotTypes[inspectedObject.spotType].options : hardware.hardwareTypes[inspectedObject.hardwareType].options : null;
+
+
+  function setInspectedObjectOptionValue(optionName, newValue) {
+    // temp function - would ask socket.io server to update clients and db here
+    console.log(`Setting '${optionName}' to '${newValue}'`);
+  }
+
 
 
   return (
     <>
       <NavigationBar />
-      <InspectorBar inspectedObject={inspectedObject} inspectedObjectOptions={inspectedObjectOptions} />
-      <Map spots={spots.spots} setInspectedObject={setInspectedObject} />
+      <InspectorBar inspectedObject={inspectedObject} inspectedObjectOptions={inspectedObjectOptions} setInspectedObjectOptionValue={setInspectedObjectOptionValue} />
+      <Map spots={spots.spots} hardware={hardware.hardware} setInspectedObject={setInspectedObject} />
     </>
   )
 }

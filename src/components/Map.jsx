@@ -9,21 +9,23 @@ import HardwareSpot from "./HardwareSpot";
 
 
 
-export default function Map({ spots, setInspectedObject }) {
-  const [scale, setScale] = useState(1); // Zoom level
-  const [position, setPosition] = useState({ x: 0, y: 0 }); // Container position
-  const [dragging, setDragging] = useState(false); // Dragging state
-  const [start, setStart] = useState({ x: 0, y: 0 }); // Initial drag position
+export default function Map({ spots, hardware, setInspectedObject }) {
+
+  // map navigation states
+  const [scale, setScale] = useState(1);
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [dragging, setDragging] = useState(false);
+  const [start, setStart] = useState({ x: 0, y: 0 });
 
 
 
-  // Handle zooming with mouse wheel
+  // zoom via mouse scroll
   const handleWheel = (e) => {
     const zoomSpeed = 0.13;
     const newScale = Math.exp(Math.min(Math.log(5), Math.max(Math.log(0.05), Math.log(scale) - e.deltaY * zoomSpeed * 0.01)));
 
 
-    // Adjust position to keep the zoom focused on the mouse pointer
+    // offset position to keep map centered during zoom
     const rect = e.currentTarget.getBoundingClientRect();
     const mouseX = e.clientX - rect.left;
     const mouseY = e.clientY - rect.top;
@@ -37,14 +39,16 @@ export default function Map({ spots, setInspectedObject }) {
     setPosition(newPosition);
   };
 
-  // Start dragging
+  // map drag start
   const handleMouseDown = (e) => {
-    e.preventDefault();
     setDragging(true);
     setStart({ x: e.clientX - position.x, y: e.clientY - position.y });
+
+    // prevent selection of text
+    document.body.style.userSelect = "none";
   };
 
-  // Dragging movement
+  // map dragging
   const handleMouseMove = (e) => {
     if (!dragging) return;
     setPosition({
@@ -53,7 +57,7 @@ export default function Map({ spots, setInspectedObject }) {
     });
   };
 
-  // Stop dragging
+  // map drag end
   const handleMouseUp = () => {
     setDragging(false);
   };
@@ -78,6 +82,11 @@ export default function Map({ spots, setInspectedObject }) {
       >
         {spots.map((spot, index) => (
           <HardwareSpot key={index} spot={spot} setInspectedObject={setInspectedObject} />
+        ))}
+
+
+        {hardware.map((hardware, index) => (
+          <HardwareSpot key={index} hardware={hardware} setInspectedObject={setInspectedObject} />
         ))}
       </section>
     </div>

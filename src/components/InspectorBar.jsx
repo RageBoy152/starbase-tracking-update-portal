@@ -3,11 +3,11 @@
 
 
 //  React Compontents
-import SideBarItemGroup from "./SideBarItemGroup"
+import InspectorOption from "./InspectorOption"
 
 
 
-export default function InspectorBar({ inspectedObject, inspectedObjectOptions }) {
+export default function InspectorBar({ inspectedObject, inspectedObjectOptions, setInspectedObjectOptionValue }) {
   console.log(inspectedObject);
   console.log(inspectedObjectOptions);
 
@@ -25,19 +25,9 @@ export default function InspectorBar({ inspectedObject, inspectedObjectOptions }
       </section>
 
       <section className="flex flex-col text-sm overflow-y-scroll">
-        {inspectedObjectOptions && inspectedObjectOptions.map((inspectedObjectOption, index) => {
-          {console.log(inspectedObjectOption)}
-          
-          return (
-            <div className={`bg-body/50 py-3 hover:bg-body px-5`}>
-              <p className={`min-w-1/2`}>{inspectedObjectOption.optionName}</p>
-              <div className="ms-auto flex">
-                <input type="text" value={inspectedObjectOption.optionValue} onChange={(e) => handleInspectedObjectOptionValueChange(inspectedObjectOption.optionName, e.target.value)} />
-              </div>
-            </div>
-          )
-        })}
-
+        {inspectedObjectOptions && inspectedObjectOptions.map((inspectedObjectOption, index) => (
+          <InspectorOption key={index} inspectedObjectOption={inspectedObjectOption} setInspectedObjectOptionValue={setInspectedObjectOptionValue} />
+        ))}
       </section>
     </section>
   )

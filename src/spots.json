@@ -13,12 +13,9 @@
   ],
   "spotTypes": {
     "ShipWorkStand": {
-      "options": [
-        {
-          "optionName": "hardwareId",
-          "optionValue": ""
-        }
-      ],
+      "options": {
+        "hardwareId" : ""
+      },
       "supportedHardwareRequirements": {
         "hardwareType": ["Ship"],
         "barrels": 6
