@@ -21,11 +21,77 @@
   --color-accent: theme('colors.accent');
   --color-black: theme('colors.black');
   --color-white: theme('colors.white');
+  --color-body: theme('colors.body');
+
+  --color-body: theme('colors.body');
 }
 
 
 
-/*   CUSTOMIZE SCROLLBAR   */
+/*   CUSTOM SCROLLBARS   */
+
 ::-webkit-scrollbar { width: 5px; }
 ::-webkit-scrollbar-thumb { z-index: 10; cursor: default; background-color: var(--color-black); width: 5px; border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background-color: var(--color-black); }
+
+
+
+/*   CUSTOM INPUT SLIDER   */
+
+input[type=range] {
+  appearance: none;
+  height: 4px;
+  border-radius: 4px;
+  cursor: e-resize;
+}
+input[type=range]::-webkit-slider-thumb {
+  appearance: none;
+  background-color: var(--color-body);
+  
+  width: 8px; aspect-ratio: 1;
+  border-radius: 8px;
+}
+
+/*  input slider hover state  */
+input[type=range]:hover::-webkit-slider-thumb { opacity: 0.7; }
+
+
+
+/*   CUSTOM CHECKBOX   */
+
+input[type=checkbox] {
+  appearance: none;
+  
+  position: relative;
+  height: 100%; aspect-ratio: 1;
+}
+
+input[type=checkbox]:checked::after {
+  background-color: var(--color-body);
+  border-radius: 0.125rem;
+
+  position: absolute; left: 0;
+  width: 100%; height: 100%;
+
+  content: '✓';
+  text-align: center;
+}
+
+
+
+/*   inspector accordian functionality   */
+
+.collapse-wrapper .collapse-content-heading {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.collapse-wrapper .collapse-content-heading i {
+  font-size: 0.7rem;
+}
+
+
+.inspector-option-field:last-of-type { border-bottom: 1px solid var(--color-black); }
+
+
+.object.objectActive { box-shadow: var(--color-accent) 0 0 25px;}

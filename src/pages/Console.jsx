@@ -31,7 +31,7 @@ export default function Console() {
     <>
       <NavigationBar />
       <InspectorBar inspectedObject={inspectedObject} inspectedObjectOptions={inspectedObjectOptions} setInspectedObjectOptionValue={setInspectedObjectOptionValue} />
-      <Map spots={spots.spots} hardware={hardware.hardware} setInspectedObject={setInspectedObject} />
+      <Map spots={spots.spots} objects={hardware.objects} setInspectedObject={setInspectedObject} inspectedObject={inspectedObject} />
     </>
   )
 }

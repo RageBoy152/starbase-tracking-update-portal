@@ -9,7 +9,7 @@ import HardwareSpot from "./HardwareSpot";
 
 
 
-export default function Map({ spots, hardware, setInspectedObject }) {
+export default function Map({ spots, objects, setInspectedObject, inspectedObject }) {
 
   // map navigation states
   const [scale, setScale] = useState(1);
@@ -41,7 +41,6 @@ export default function Map({ spots, hardware, setInspectedObject }) {
 
   // map drag start
   const handleMouseDown = (e) => {
-    setDragging(true);
     setStart({ x: e.clientX - position.x, y: e.clientY - position.y });
 
     // prevent selection of text
@@ -50,7 +49,9 @@ export default function Map({ spots, hardware, setInspectedObject }) {
 
   // map dragging
   const handleMouseMove = (e) => {
-    if (!dragging) return;
+    if (e.buttons == 1) { setDragging(true); }
+    else { return; }
+
     setPosition({
       x: e.clientX - start.x,
       y: e.clientY - start.y,
@@ -58,10 +59,14 @@ export default function Map({ spots, hardware, setInspectedObject }) {
   };
 
   // map drag end
-  const handleMouseUp = () => {
+  const handleMouseUp = (e) => {
+    !dragging && e.type != "mouseleave" && setInspectedObject(null);
     setDragging(false);
   };
 
+
+  $(`.object.objectActive`).removeClass('objectActive border-2');
+  if (inspectedObject) { $(`.object[data-object-id="${inspectedObject.id}"]:not(.objectActive)`).addClass('objectActive border-2'); }
 
 
   return (
@@ -85,8 +90,8 @@ export default function Map({ spots, hardware, setInspectedObject }) {
         ))}
 
 
-        {hardware.map((hardware, index) => (
-          <HardwareSpot key={index} hardware={hardware} setInspectedObject={setInspectedObject} />
+        {objects.map((object, index) => (
+          <HardwareSpot key={index} object={object} setInspectedObject={setInspectedObject} />
         ))}
       </section>
     </div>

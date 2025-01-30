@@ -1,7 +1,7 @@
 {
   "spots": [
     {
-      "id": "uuidv4 id here",
+      "id": "uuidv4 id here for spot",
       "objectName": "MB-2 Work Stand 2",
       "spotType": "ShipWorkStand",
       "hardwareId": "",
@@ -14,7 +14,7 @@
   "spotTypes": {
     "ShipWorkStand": {
       "options": {
-        "hardwareId" : ""
+        "hardwareId" : "text_no hardware"
       },
       "supportedHardwareRequirements": {
         "hardwareType": ["Ship"],
