@@ -1,9 +1,10 @@
 {
   "spots": [
     {
-      "id": "uuidv4 id here for spot",
+      "id": "1f18ad32-e236-4769-8cc0-727bd0cecca1",
       "objectName": "MB-2 Work Stand 2",
       "spotType": "ShipWorkStand",
+      "hardwareOrigin": "Megabay 2",
       "hardwareId": "",
       "position": {
         "x": 0,

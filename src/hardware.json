@@ -1,9 +1,10 @@
 {
   "objects": [
     {
-      "id": "uuidv4 id here",
-      "objectName": "Ship 34",
+      "id": "b5381725-f656-4b74-bf5c-34769795914c",
+      "objectSN": 34,
       "hardwareType": "Ship",
+      "hardwareOrigin": "Starfactory",
       "standId": "",
       "spotId": "id of occupied spot if applicable",
       "position": {

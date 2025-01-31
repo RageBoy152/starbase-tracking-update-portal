@@ -14,8 +14,9 @@ import hardware from '../hardware.json';
 
 
 
-export default function Console() {
+export default function ProductionSite() {
   const [inspectedObject, setInspectedObject] = useState(null);
+  const [inspectorModalOpen, setInspectorModalOpen] = useState(false);
   
   const inspectedObjectOptions = inspectedObject ? spots.spotTypes[inspectedObject.spotType] ? spots.spotTypes[inspectedObject.spotType].options : hardware.hardwareTypes[inspectedObject.hardwareType].options : null;
 
@@ -30,7 +31,7 @@ export default function Console() {
   return (
     <>
       <NavigationBar />
-      <InspectorBar inspectedObject={inspectedObject} inspectedObjectOptions={inspectedObjectOptions} setInspectedObjectOptionValue={setInspectedObjectOptionValue} />
+      <InspectorBar setInspectorModalOpen={setInspectorModalOpen} inspectedObject={inspectedObject} inspectedObjectOptions={inspectedObjectOptions} hardwareTypes={hardware.hardwareTypes} setInspectedObjectOptionValue={setInspectedObjectOptionValue} />
       <Map spots={spots.spots} objects={hardware.objects} setInspectedObject={setInspectedObject} inspectedObject={inspectedObject} />
     </>
   )

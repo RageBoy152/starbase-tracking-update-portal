@@ -58,7 +58,7 @@ export default function InspectorBar({ inspectedObjectOption, setInspectedObject
   return (
     <div className={`py-1 border-t border-black px-${((optionDepth*1)+5)} pe-5 flex inspector-option-field`}>
       <p className={`w-1/2 text-xs font-semibold`}>{camelToCapitalized(inspectedObjectOption.optionName)}</p>
-      <div className="ms-auto flex items-center w-1/2">{inputHTML}</div>
+      <div className="ms-auto flex items-center w-1/2 gap-2">{inputHTML}</div>
     </div>
   )
 }

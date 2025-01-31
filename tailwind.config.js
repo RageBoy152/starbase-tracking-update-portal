@@ -16,14 +16,17 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        "Chakra": ["Chakra Petch", "sans-serif"]
+        "Chakra": ["Chakra Petch", "sans-serif"],
+        "Bebas": ["Bebas Neue", "serif"]
       },
       colors: {
         body: "#4E4E4E",
         primary: "#7A7A7A",
         secondary: "#5c6068",
         accent: "#4178F0",
-        black: "#2E2E2E",
+        danger: "#A53C3C",
+        danger2: "#D60000",
+        black: "#333333",
         white: "#EEEEEE"
       }
     },
