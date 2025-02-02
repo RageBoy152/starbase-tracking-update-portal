@@ -29,10 +29,10 @@ export function copyText(text, link) {
   navigator.clipboard.writeText(text);
 
   $(link).addClass('hover:bg-green-700 bg-green-700');
-  $(link).removeClass('hover:text-black');
+  $(link).removeClass('hover:text-black hover:bg-white');
   
   delay(1000).then(() => {
     $(link).removeClass('hover:bg-green-700 bg-green-700');
-    $(link).addClass('hover:text-black');
+    $(link).addClass('hover:text-black hover:bg-white');
   })
 }

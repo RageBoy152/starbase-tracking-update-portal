@@ -5,16 +5,13 @@
       "objectSN": 34,
       "hardwareType": "Ship",
       "hardwareOrigin": "Starfactory",
+      "status": "faded",
       "standId": "",
       "spotId": "id of occupied spot if applicable",
       "position": {
         "x": 1,
         "y": 0
-      }
-    }
-  ],
-  "hardwareTypes": {
-    "Ship": {
+      },
       "options": {
         "barrels": "number_0_0_6_1",
         "barrelConfig": {
@@ -69,9 +66,27 @@
         "shipControls": {
           "fwdFlapSetting": "slider_0_0_1_0.1",
           "aftFlapSetting": "slider_0_0_1_0.1",
-          "payloadDoorOpen": "bool_true"
+          "payloadDoorOpen": "bool_false"
         }
       }
+    },
+    {
+      "id": "1f18ad32-e236-4769-8cc0-727bd0cecca1",
+      "objectName": "MB-2 Work Stand 2",
+      "hardwareType": "ShipWorkStand",
+      "status": "spot",
+      "hardwareOrigin": "Megabay 2",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "options": {
+        "hardwareId" : "text_"
+      },
+      "supportedHardwareRequirements": {
+        "hardwareType": ["Ship"],
+        "barrels": 6
+      }
     }
-  }
+  ]
 }

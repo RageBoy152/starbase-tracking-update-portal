@@ -9,11 +9,7 @@
       "position": {
         "x": 0,
         "y": 0
-      }
-    }
-  ],
-  "spotTypes": {
-    "ShipWorkStand": {
+      },
       "options": {
         "hardwareId" : "text_no hardware"
       },
@@ -22,5 +18,5 @@
         "barrels": 6
       }
     }
-  }
+  ]
 }

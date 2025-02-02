@@ -1,0 +1,130 @@
+{
+  "Ship": {
+    "objectSN": 0,
+    "hardwareType": "Ship",
+    "hardwareOrigin": "Starfactory",
+    "standId": "",
+    "spotId": "",
+    "options": {
+      "barrels": "number_6_0_6_1",
+      "barrelConfig": {
+        "NC": {
+          "fwdFlap": "number_2_0_2_1",
+          "fwdFlapAerocover": "number_2_0_2_1",
+          "TPS": "slider_1_0_1_0.1",
+          "Internal": "slider_1_0_1_0.1"
+        },
+        "PL:3": {
+          "barrelRings": "number_3_0_3_1",
+          "TPS": "slider_1_0_1_0.1",
+          "payloadDoor": "bool_true",
+          "pez": "bool_true"
+        },
+        "FX:4": {
+          "barrelRings": "number_4_0_4_1",
+          "TPS": "slider_1_0_1_0.1",
+          "stringers": "slider_1_0_1_0.1"
+        },
+        "CX:3": {
+          "barrelRings": "number_3_0_3_1",
+          "TPS": "slider_1_0_1_0.1",
+          "beeHive": "bool_true",
+          "stringers": "slider_1_0_1_0.1"
+        },
+        "A2:3": {
+          "barrelRings": "number_3_0_3_1",
+          "TPS": "slider_1_0_1_0.1"
+        },
+        "A3:4": {
+          "barrelRings": "number_4_0_4_1",
+          "TPS": "slider_1_0_1_0.1",
+          "aftAerocover": "number_2_0_2_1"
+        },
+        "AX:4": {
+          "barrelRings": "number_4_0_4_1",
+          "TPS": "slider_1_0_1_0.1",
+          "aftAerocover": "number_2_0_2_1",
+          "stringers": "slider_1_0_1_0.1",
+          "cameras": "number_2_0_2_1",
+          "aftFloor": "number_6_0_6_1",
+          "QD": "bool_true"
+        }
+      },
+      "shipConfig": {
+        "aftFlap": "number_2_0_2_1",
+        "racewayCovers": "number_2_0_2_1",
+        "raptorSea": "slider_3_0_3_1",
+        "raptorVac": "slider_3_0_3_1"
+      },
+      "shipControls": {
+        "fwdFlapSetting": "slider_0_0_1_0.1",
+        "aftFlapSetting": "slider_0_0_1_0.1",
+        "payloadDoorOpen": "bool_false"
+      }
+    }
+  },
+  "NC": {
+    "objectSN": 0,
+    "hardwareType": "Ship",
+    "hardwareOrigin": "Starfactory",
+    "standId": "",
+    "spotId": "",
+    "options": {
+      "barrels": "number_0_0_6_1",
+      "barrelConfig": {
+        "NC": {
+          "fwdFlap": "number_0_0_2_1",
+          "fwdFlapAerocover": "number_0_0_2_1",
+          "TPS": "slider_0_0_1_0.1",
+          "Internal": "slider_0_0_1_0.1"
+        },
+        "PL:3": {
+          "barrelRings": "number_3_0_3_1",
+          "TPS": "slider_0_0_1_0.1",
+          "payloadDoor": "bool_false",
+          "pez": "bool_false"
+        },
+        "FX:4": {
+          "barrelRings": "number_4_0_4_1",
+          "TPS": "slider_0_0_1_0.1",
+          "stringers": "slider_0_0_1_0.1"
+        },
+        "CX:3": {
+          "barrelRings": "number_3_0_3_1",
+          "TPS": "slider_0_0_1_0.1",
+          "beeHive": "bool_false",
+          "stringers": "slider_0_0_1_0.1"
+        },
+        "A2:3": {
+          "barrelRings": "number_3_0_3_1",
+          "TPS": "slider_0_0_1_0.1"
+        },
+        "A3:4": {
+          "barrelRings": "number_4_0_4_1",
+          "TPS": "slider_0_0_1_0.1",
+          "aftAerocover": "number_0_0_2_1"
+        },
+        "AX:4": {
+          "barrelRings": "number_4_0_4_1",
+          "TPS": "slider_0_0_1_0.1",
+          "aftAerocover": "number_0_0_2_1",
+          "stringers": "slider_0_0_1_0.1",
+          "cameras": "number_0_0_2_1",
+          "aftFloor": "number_0_0_?_1",
+          "QD": "bool_false"
+        }
+      },
+      "shipConfig": {
+        "aftFlap": "number_0_0_2_1",
+        "racewayCovers": "number_0_0_2_1",
+        "raptorSea": "slider_0_0_3_1",
+        "raptorVac": "slider_0_0_3_1"
+      },
+      "shipControls": {
+        "fwdFlapSetting": "slider_0_0_1_0.1",
+        "aftFlapSetting": "slider_0_0_1_0.1",
+        "payloadDoorOpen": "bool_false"
+      }
+    }
+  }
+}

@@ -1,7 +1,6 @@
 import { StrictMode } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { createRoot } from 'react-dom/client'
-import { io } from 'socket.io-client';
 
 
 
@@ -20,13 +19,6 @@ import TrackingLabelModal from './components/TrackingLabelModal.jsx';
 
 
 import './defaultStyles.css'
-
-
-
-
-//  socket io
-
-const socket = io('http://localhost:3000');
 
 
 
