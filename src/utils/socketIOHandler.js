@@ -9,6 +9,12 @@ export function fetchObjectsData() {
 
 
 
+export function fetchObjectDataFromId(id) {
+  socket.emit('objectFetchFromIdReq', id);
+}
+
+
+
 export function socketAddNewObject(newObject) {
   socket.emit('addNewObject', newObject);
 }
@@ -21,6 +27,6 @@ export function socketDeleteInspectedObject(deleteObjectId) {
 
 
 
-export function socketUpdateInspectedObject(updatedObject) {
+export function socketUpdateObject(updatedObject) {
   socket.emit('updateObject', updatedObject);
 }

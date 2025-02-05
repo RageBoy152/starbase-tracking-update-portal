@@ -9,7 +9,7 @@ import HardwareSpot from "./HardwareSpot";
 
 
 
-export default function Map({ objects, setInspectedObject, inspectedObject, addNewObject }) {
+export default function Map({ objects, setInspectedObject, inspectedObject, addNewObject, updateObject }) {
 
 
   //    MAP NAVIGATION STATES    \\
@@ -46,6 +46,10 @@ export default function Map({ objects, setInspectedObject, inspectedObject, addN
   //    MAP DRAG EVENTS    \\
 
   const handleMouseDown = (e) => {
+    const isDraggable = e.target.closest('.draggableObject');
+    if (isDraggable) { return; }
+
+
     setStart({ x: e.clientX - position.x, y: e.clientY - position.y });
 
     // prevent selection of text
@@ -54,7 +58,7 @@ export default function Map({ objects, setInspectedObject, inspectedObject, addN
 
 
   const handleMouseMove = (e) => {
-    if (e.buttons == 1) { setDragging(true); }
+    if (e.buttons == 1 && !e.target.closest('.draggableObject')) { setDragging(true); }
     else { return; }
 
     setPosition({
@@ -79,9 +83,10 @@ export default function Map({ objects, setInspectedObject, inspectedObject, addN
 
   //    OBJECT DROP EVENT    \\
 
-  function handleObjectDrop(e, ui) {               //  LOGIC ERROR HERE WHEN TRANSLATE AND ZOOM NOT DEFAULT ON MAP - DONT THINK IT ACCOUNTS FOR TRANSLATE AND ZOOM AT ALL RN
+  function handleObjectDrop(e, ui) {               //  LOGIC ERROR HERE
     // get template key from drag data
     let objectTemplateKey = ui.helper.data('objectTemplateKey');
+    let objectId = ui.helper.attr('data-object-id');
 
 
     // get coords for calcing new positions
@@ -89,12 +94,12 @@ export default function Map({ objects, setInspectedObject, inspectedObject, addN
     const mapRect = $('#objects-container')[0].getBoundingClientRect();
     
     // calc relative positions
-    let spawnPosX = (x - mapRect.x);
-    let spawnPosY = (y - mapRect.y);
-
+    let spawnPosX = ((x - mapRect.x) - position.x) / scale;
+    let spawnPosY = ((y - mapRect.y) - position.y) / scale;
 
     // add new object
-    addNewObject(objectTemplateKey, spawnPosX, spawnPosY);
+    if (objectId == null) { addNewObject(objectTemplateKey, spawnPosX, spawnPosY); }
+    else { updateObject(objectId, spawnPosX, spawnPosY); }
   }
 
 
@@ -104,7 +109,7 @@ export default function Map({ objects, setInspectedObject, inspectedObject, addN
       drop: function (e, ui) { handleObjectDrop(e, ui); },
       accept: '.draggableObject'
     });
-  }, []);
+  }, [objects]);
 
 
   return (
@@ -128,7 +133,7 @@ export default function Map({ objects, setInspectedObject, inspectedObject, addN
       </section> */}
 
 
-      <section id="objects-container" className="relative" style={{ transform: `translate(${position.x}px, ${position.y}px) scale(${scale})`, transformOrigin: "top left", }}>
+      <section id="objects-container" className="relative bg-danger" style={{ transform: `translate(${position.x}px, ${position.y}px) scale(${scale})`, transformOrigin: "top left", }}>
         {objects && objects.map((object, index) => (
           <HardwareSpot key={index} object={object} setInspectedObject={setInspectedObject} />
         ))}

@@ -1,5 +1,6 @@
 //  React Hooks
 import { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 
 
 //  React Compontents
@@ -12,7 +13,7 @@ import Map from '../components/Map.jsx'
 // import hardware from '../hardware.json';
 import objectTemplates from '../objectTemplates.json';
 
-import { socket, fetchObjectsData, socketAddNewObject, socketDeleteInspectedObject, socketUpdateInspectedObject } from '../utils/socketIOHandler.js';
+import { socket, fetchObjectsData, socketUpdateObject, socketAddNewObject, socketDeleteInspectedObject } from '../utils/socketIOHandler.js';
 
 
 
@@ -21,6 +22,9 @@ export default function ProductionSite() {
   const [inspectedObject, setInspectedObject] = useState(null);
   
   const inspectedObjectOptions = inspectedObject ? inspectedObject.options : null;
+
+  const location = useLocation();
+  const urlSelectedObjectId = new URLSearchParams(location.search).get('id');
 
 
 
@@ -33,6 +37,13 @@ export default function ProductionSite() {
 
     return () => { socket.off('objectsFetchRes', handleRes) }
   }, []);
+
+
+  useEffect(() => {
+    if (objectsData && urlSelectedObjectId) {
+      setInspectedObject(objectsData.find(object => object.id == urlSelectedObjectId));
+    }
+  }, [objectsData]);
 
 
 
@@ -79,18 +90,25 @@ export default function ProductionSite() {
 
 
     // tell socket to update
-    socketUpdateInspectedObject(editedObject);
+    socketUpdateObject(editedObject);
   }
 
 
   function addNewObject(objectTemplateKey, spawnPosX, spawnPosY) {
-    // temp function - would ask socket.io server to add to the db and update clients here
-    // console.log(`Adding object from template '${objectTemplateKey}' at positions | X: ${spawnPosX}, Y: ${spawnPosY} |`);
-    
     let newObject = objectTemplates[objectTemplateKey];
     newObject.position = { x: spawnPosX, y: spawnPosY };
+    newObject.hardwareOnMap = location.pathname.split('/')[1];
 
     socketAddNewObject(newObject);
+  }
+
+  
+  function updateObject(objectId, newPosX, newPosY) {
+    let editedObject = { ...objectsData.find(object => object.id == objectId) };
+    editedObject.position = { x: newPosX, y: newPosY };
+    editedObject.hardwareOnMap = location.pathname.split('/')[1];
+
+    socketUpdateObject(editedObject);
   }
 
 
@@ -105,7 +123,7 @@ export default function ProductionSite() {
     <>
       <NavigationBar />
       <InspectorBar inspectedObject={inspectedObject} inspectedObjectOptions={inspectedObjectOptions} objectTemplates={objectTemplates} setInspectedObjectOptionValue={setInspectedObjectOptionValue} deleteInspectedObject={deleteInspectedObject} />
-      <Map objects={objectsData} setInspectedObject={setInspectedObject} inspectedObject={inspectedObject} addNewObject={addNewObject} />
+      <Map objects={objectsData} setInspectedObject={setInspectedObject} inspectedObject={inspectedObject} addNewObject={addNewObject} updateObject={updateObject} />
     </>
   )
 }

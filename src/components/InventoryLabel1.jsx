@@ -42,7 +42,7 @@ export default function InventoryLabel1({ object, quantity=1 }) {
         break;
     }
 
-    return objectName != '' && object.objectSN ? `${objectName} ${objectName[0]}N${object.objectSN}` : object.objectName;
+    return objectName != '' && object.objectSN != null ? `${objectName} ${objectName[0]}N${object.objectSN}` : object.objectName;
   }
 
 

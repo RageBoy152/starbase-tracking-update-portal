@@ -15,6 +15,8 @@ import Massey from './pages/Massey.jsx';
 import InventoryLabel1 from './components/InventoryLabel1.jsx';
 
 import TrackingLabelModal from './components/TrackingLabelModal.jsx';
+import ToObject from './pages/toObject.jsx';
+
 
 
 
@@ -42,6 +44,7 @@ createRoot(document.getElementById('root')).render(
         <Route path="/labelmaker" element={<InventoryLabel1 />}></Route>
 
         <Route path="/tracking-label" element={<TrackingLabelModal />}></Route>
+        <Route path="/to-object" element={<ToObject />}></Route>
       </Routes>
     </BrowserRouter>
   </StrictMode>

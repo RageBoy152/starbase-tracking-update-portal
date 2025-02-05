@@ -1,17 +1,19 @@
 //  React Hooks
 
 
-
 //  React Compontents
 import InspectorOption from "./InspectorOption"
 
 
-import React, { useState, useEffect } from "react"
-import { camelToCapitalized, toggleInputGroup } from '../utils/utils.js';
+import React, { useState, useEffect, useRef } from "react"
+import { camelToCapitalized, copyText, toggleInputGroup } from '../utils/utils.js';
 
 
 
 export default function InspectorBar({ inspectedObject, inspectedObjectOptions, setInspectedObjectOptionValue, objectTemplates, deleteInspectedObject }) {
+
+  const inspectorBarCopyLinkRef = useRef();
+
 
   //    OBJECT OPTION FIELDS    \\
   const [searchValue, setSearchValue] = useState('');
@@ -98,7 +100,6 @@ export default function InspectorBar({ inspectedObject, inspectedObjectOptions, 
 
 
 
-
   return (
     <section className="w-2/12 min-w-[320px] fixed end-0 h-full flex flex-col bg-primary z-20">
 
@@ -112,10 +113,10 @@ export default function InspectorBar({ inspectedObject, inspectedObjectOptions, 
       {/*    OBJECT ACTION BTNS    */}
       
       {inspectedObjectOptions && (
-        <section className="flex justify-center items-center pb-7 px-7 gap-3">
-          <a className="ring-1 ring-white hover:bg-white hover:text-black w-[40px] aspect-square flex justify-center items-center rounded cursor-pointer"><i className="bi bi-link-45deg flex"></i></a>
-          <a className="ring-1 ring-white hover:bg-white hover:text-black w-[40px] aspect-square flex justify-center items-center rounded ms-auto cursor-pointer"><i className="bi bi-arrows-move flex"></i></a>
+        <section className="flex justify-start items-center pb-7 px-7 gap-3">
+          <a ref={inspectorBarCopyLinkRef} className="ring-1 ring-white hover:bg-white hover:text-black w-[40px] aspect-square flex justify-center items-center rounded cursor-pointer" onClick={() => copyText(`${location.origin}/to-object?id=${inspectedObject.id}`, inspectorBarCopyLinkRef.current)}><i className="bi bi-link-45deg flex"></i></a>
           <a className="ring-1 ring-white hover:bg-danger w-[40px] aspect-square flex justify-center items-center rounded cursor-pointer" onClick={deleteInspectedObject}><i className="bi bi-trash flex"></i></a>
+          <a ref={inspectorBarCopyLinkRef} className="ring-1 ring-white hover:bg-white hover:text-black w-[40px] aspect-square flex justify-center items-center rounded cursor-pointer ms-auto"><i className="bi bi-arrow-right flex"></i></a>
         </section>
       )}
 
