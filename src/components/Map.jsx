@@ -1,77 +1,81 @@
 //  React Hooks
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, useMemo } from "react";
 
 
 //  React Compontents
 
-import HardwareSpot from "./HardwareSpot";
+import { HardwareSpot } from "./HardwareSpot";
 
 
 
 export default function Map({ objects, setInspectedObject, inspectedObject, addNewObject, updateObject }) {
+  const memoizedObjects = useMemo(() => objects, [objects]);
+
 
 
   //    MAP NAVIGATION STATES    \\
+  
+  const zoomSpeed = 0.1;
+  const minZoom = 0.5;
+  const maxZoom = 3;
+
   const [scale, setScale] = useState(1);
   const [position, setPosition] = useState({ x: 0, y: 0 });
-  const [dragging, setDragging] = useState(false);
-  const [start, setStart] = useState({ x: 0, y: 0 });
+
+  const [armClearInspect, setArmClearInspect] = useState(false);
+  const [cancelDrag, setCancelDrag] = useState(false);
+
+
+  const mapRef = useRef(null);
 
 
 
-  //    MOUSE SCROLL = ZOOM    \\
+  function handleScroll(e) {
+    if (!mapRef.current) return;
 
-  const handleWheel = (e) => {
-    const zoomSpeed = 0.13;
-    const newScale = Math.exp(Math.min(Math.log(5), Math.max(Math.log(0.05), Math.log(scale) - e.deltaY * zoomSpeed * 0.01)));
-
-
-    // offset position to keep map centered during zoom
-    const rect = e.currentTarget.getBoundingClientRect();
+    const rect = mapRef.current.getBoundingClientRect();
     const mouseX = e.clientX - rect.left;
     const mouseY = e.clientY - rect.top;
 
-    const newPosition = {
-      x: mouseX - ((mouseX - position.x) * newScale) / scale,
-      y: mouseY - ((mouseY - position.y) * newScale) / scale,
-    };
+    const scaleFactor = 1 + zoomSpeed * -Math.sign(e.deltaY);
+    const newScale = Math.max(minZoom, Math.min(maxZoom, scale * scaleFactor));
+
+    // Calculate how much the zoom is shifting the position
+    const scaleRatio = newScale / scale;
+    const newPosX = mouseX - (mouseX - position.x) * scaleRatio;
+    const newPosY = mouseY - (mouseY - position.y) * scaleRatio;
 
     setScale(newScale);
-    setPosition(newPosition);
-  };
+    setPosition({ x: newPosX, y: newPosY });
+  }
 
+  function handleMouseDown(e) {
+    // allow clicks on map objects
+    if (e.target.id != 'map-container') { setCancelDrag(true); }
+    
+    setArmClearInspect(true);
+    document.body.style.userSelect = 'none';
+  }
 
+  function handleMouseUp(e) {
+    if (armClearInspect && !cancelDrag) { setInspectedObject(null); }
 
-  //    MAP DRAG EVENTS    \\
+    setCancelDrag(false);
+    document.body.style.userSelect = 'unset';
+  }
 
-  const handleMouseDown = (e) => {
-    const isDraggable = e.target.closest('.draggableObject');
-    if (isDraggable) { return; }
+  function handleMouseMove(e) {
+    // must be holding LMB
+    if (e.buttons != 1 || cancelDrag) { return; }
 
-
-    setStart({ x: e.clientX - position.x, y: e.clientY - position.y });
-
-    // prevent selection of text
-    document.body.style.userSelect = "none";
-  };
-
-
-  const handleMouseMove = (e) => {
-    if (e.buttons == 1 && !e.target.closest('.draggableObject')) { setDragging(true); }
-    else { return; }
+    setArmClearInspect(false);
 
     setPosition({
-      x: e.clientX - start.x,
-      y: e.clientY - start.y,
+      x: position.x + e.movementX,
+      y: position.y + e.movementY
     });
-  };
-
-
-  const handleMouseUp = (e) => {
-    !dragging && e.type != "mouseleave" && setInspectedObject(null);
-    setDragging(false);
-  };
+  }
 
 
 
@@ -115,11 +119,14 @@ export default function Map({ objects, setInspectedObject, inspectedObject, addN
   return (
     <div
       className="relative w-screen h-screen overflow-hidden cursor-grab"
-      onWheel={handleWheel}
+      onWheel={handleScroll}
       onMouseDown={handleMouseDown}
-      onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
-      onMouseLeave={handleMouseUp}
+      onMouseMove={handleMouseMove}
+
+      ref={mapRef}
+
+      // onMouseLeave={handleMouseUp}
 
       // onDrop={handleObjectDrop}
       // onDragOver={(e) => e.preventDefault()}
@@ -133,9 +140,14 @@ export default function Map({ objects, setInspectedObject, inspectedObject, addN
       </section> */}
 
 
-      <section id="objects-container" className="relative bg-danger" style={{ transform: `translate(${position.x}px, ${position.y}px) scale(${scale})`, transformOrigin: "top left", }}>
-        {objects && objects.map((object, index) => (
-          <HardwareSpot key={index} object={object} setInspectedObject={setInspectedObject} />
+      <section id="objects-container" className="relative"
+      style={{
+        transform: `translate(${position.x}px, ${position.y}px) scale(${scale})`,
+        transformOrigin: "top left"
+        }}
+      >
+        {memoizedObjects && memoizedObjects.map((object, index) => (
+          <HardwareSpot key={index} object={object} setInspectedObject={setInspectedObject} updateObject={updateObject} mapScale={scale} />
         ))}
       </section>
     </div>

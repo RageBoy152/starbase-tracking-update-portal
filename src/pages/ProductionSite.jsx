@@ -1,6 +1,7 @@
 //  React Hooks
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
+import { useAuth } from '../Authenticator.jsx';
 
 
 //  React Compontents
@@ -18,10 +19,11 @@ import { socket, fetchObjectsData, socketUpdateObject, socketAddNewObject, socke
 
 
 export default function ProductionSite() {
+  const { user, logout } = useAuth();
+
+
   const [objectsData, setObjectsData] = useState(null);
   const [inspectedObject, setInspectedObject] = useState(null);
-  
-  const inspectedObjectOptions = inspectedObject ? inspectedObject.options : null;
 
   const location = useLocation();
   const urlSelectedObjectId = new URLSearchParams(location.search).get('id');
@@ -31,7 +33,20 @@ export default function ProductionSite() {
   useEffect(() => {
     fetchObjectsData();
 
-    const handleRes = (data) => { setObjectsData(data); }
+    const handleRes = (data, updateSingleObject) => {
+      if (updateSingleObject) {
+        if (inspectedObject && inspectedObject.id == data.id) { setInspectedObject(data); }
+
+        setObjectsData(prevData => 
+          prevData.map(obj => obj.id == data.id ? data : obj)
+        );
+      }
+      else {
+        if (inspectedObject) { setInspectedObject(data.find(object => object.id == inspectedObject.id)); }
+        setObjectsData(data);
+      }
+
+    }
 
     socket.on('objectsFetchRes', handleRes);
 
@@ -40,15 +55,23 @@ export default function ProductionSite() {
 
 
   useEffect(() => {
+    if (inspectedObject) {
+      const updatedObject = objectsData?.find(obj => obj.id === inspectedObject.id);
+
+      if (updatedObject && updatedObject !== inspectedObject) {
+        setInspectedObject({ ...updatedObject });
+      }
+    }
+
+
     if (objectsData && urlSelectedObjectId) {
       setInspectedObject(objectsData.find(object => object.id == urlSelectedObjectId));
     }
   }, [objectsData]);
 
 
-
   function setInspectedObjectOptionValue(optionName, newValue) {
-    // temp function - would ask socket.io server to update clients and db here
+    // ask socket.io server to update clients and db here
     console.log(`Setting '${optionName}' to '${newValue}'`);
 
 
@@ -103,12 +126,12 @@ export default function ProductionSite() {
   }
 
   
-  function updateObject(objectId, newPosX, newPosY) {
+  function updateObject(objectId, newPosX, newPosY, moving, save) {
     let editedObject = { ...objectsData.find(object => object.id == objectId) };
     editedObject.position = { x: newPosX, y: newPosY };
     editedObject.hardwareOnMap = location.pathname.split('/')[1];
 
-    socketUpdateObject(editedObject);
+    socketUpdateObject(editedObject, moving, save);
   }
 
 
@@ -121,8 +144,8 @@ export default function ProductionSite() {
 
   return (
     <>
-      <NavigationBar />
-      <InspectorBar inspectedObject={inspectedObject} inspectedObjectOptions={inspectedObjectOptions} objectTemplates={objectTemplates} setInspectedObjectOptionValue={setInspectedObjectOptionValue} deleteInspectedObject={deleteInspectedObject} />
+      <NavigationBar logout={logout} user={user} />
+      <InspectorBar inspectedObject={inspectedObject} objectTemplates={objectTemplates} setInspectedObjectOptionValue={setInspectedObjectOptionValue} deleteInspectedObject={deleteInspectedObject} />
       <Map objects={objectsData} setInspectedObject={setInspectedObject} inspectedObject={inspectedObject} addNewObject={addNewObject} updateObject={updateObject} />
     </>
   )

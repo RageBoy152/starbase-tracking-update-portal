@@ -10,9 +10,10 @@ import { camelToCapitalized, copyText, toggleInputGroup } from '../utils/utils.j
 
 
 
-export default function InspectorBar({ inspectedObject, inspectedObjectOptions, setInspectedObjectOptionValue, objectTemplates, deleteInspectedObject }) {
+export default function InspectorBar({ inspectedObject, setInspectedObjectOptionValue, objectTemplates, deleteInspectedObject }) {
 
   const inspectorBarCopyLinkRef = useRef();
+
 
 
   //    OBJECT OPTION FIELDS    \\
@@ -23,13 +24,20 @@ export default function InspectorBar({ inspectedObject, inspectedObjectOptions, 
 
   //    OBJECT OPTION FIELDS    \\
 
-  function spawnInspectorOption(options, depth=0) {
+  function spawnInspectorOption(object, depth=0) {
+    // extract exposed props from object
+    const { objectSN, hardwareOrigin, objectName, zIndex, options, ...rest } = object;
+
+    // merge extracted props
+    const mergedOptions = { objectSN, hardwareOrigin, objectName, zIndex, ...(options || {}) };
+
 
     // loop through options object
-    return Object.keys(options).map((optionKey, index) => {
+    return Object.keys(mergedOptions).map((optionKey, index) => {
+
       // get option value and check if its an object
-      let val = options[optionKey];
-      let isObj = typeof val == "object" && !Array.isArray(val);
+      let val = mergedOptions[optionKey];
+      let isObj = val && typeof val === "object" && !Array.isArray(val);
 
 
       if (isObj) {
@@ -50,8 +58,9 @@ export default function InspectorBar({ inspectedObject, inspectedObjectOptions, 
       }
       else {
         // end of chain, add option to DOM
+        // console.log(optionKey, val);
         return (
-          <InspectorOption optionDepth={depth} key={optionKey} inspectedObjectOption={{optionName: optionKey, optionValue: val}} setInspectedObjectOptionValue={setInspectedObjectOptionValue} />
+          <InspectorOption optionDepth={depth} key={optionKey} inspectedObjectOption={{optionName: optionKey, optionValue: val ?? ""}} setInspectedObjectOptionValue={setInspectedObjectOptionValue} />
         )
       }
     });
@@ -66,8 +75,8 @@ export default function InspectorBar({ inspectedObject, inspectedObjectOptions, 
     e.preventDefault();
 
     // popup dimensions
-    const popupWidth = 600;
-    const popupHeight = 450;
+    const popupWidth = e.currentTarget.dataset.popupwidth;
+    const popupHeight = e.currentTarget.dataset.popupheight;
 
     // calc window pos
     const left = (window.innerWidth - popupWidth) / 2 + window.screenX;
@@ -79,10 +88,10 @@ export default function InspectorBar({ inspectedObject, inspectedObjectOptions, 
 
 
 
-  //    OBJECT SPAWN DRAG START    \\
-  function handleSpawnObjectDragStart(e, objectTemplateKey) {
-    e.dataTransfer.setData('objectTemplateKey', objectTemplateKey)
-  }
+  // //    OBJECT SPAWN DRAG START    \\
+  // function handleSpawnObjectDragStart(e, objectTemplateKey) {
+  //   e.dataTransfer.setData('objectTemplateKey', objectTemplateKey)
+  // }
 
 
 
@@ -100,19 +109,20 @@ export default function InspectorBar({ inspectedObject, inspectedObjectOptions, 
 
 
 
+
   return (
     <section className="w-2/12 min-w-[320px] fixed end-0 h-full flex flex-col bg-primary z-20">
 
       {/*    INSPECTOR BAR HEADING    */}
       <section className="text-xl font-semibold uppercase p-6 ">
-        <h1>{inspectedObject ? inspectedObject.objectSN != null ? `${inspectedObject.hardwareType} ${inspectedObject.objectSN}` : inspectedObject.objectName : 'Asset Inventory'}</h1>
+        <h1>{inspectedObject ? inspectedObject.objectSN != null ? `${inspectedObject.hardwareType} ${inspectedObject.objectSN.split('_')[1]}` : inspectedObject.objectName.split('_')[1] : 'Asset Inventory'}</h1>
         <h2 className="text-base">{inspectedObject ? 'Inspector' : 'Add Hardware'}</h2>
       </section>
 
 
       {/*    OBJECT ACTION BTNS    */}
       
-      {inspectedObjectOptions && (
+      {inspectedObject && (
         <section className="flex justify-start items-center pb-7 px-7 gap-3">
           <a ref={inspectorBarCopyLinkRef} className="ring-1 ring-white hover:bg-white hover:text-black w-[40px] aspect-square flex justify-center items-center rounded cursor-pointer" onClick={() => copyText(`${location.origin}/to-object?id=${inspectedObject.id}`, inspectorBarCopyLinkRef.current)}><i className="bi bi-link-45deg flex"></i></a>
           <a className="ring-1 ring-white hover:bg-danger w-[40px] aspect-square flex justify-center items-center rounded cursor-pointer" onClick={deleteInspectedObject}><i className="bi bi-trash flex"></i></a>
@@ -125,11 +135,12 @@ export default function InspectorBar({ inspectedObject, inspectedObjectOptions, 
       {/*    INSPECTOR OPTIONS    */}
 
       <section className={`flex flex-col text-sm overflow-y-scroll pb-9`}>
-        {inspectedObjectOptions && spawnInspectorOption(inspectedObjectOptions)}
+        {inspectedObject && spawnInspectorOption(inspectedObject)}
+
 
 
         {/*    TRACKING DROPDOWN    */}
-        {inspectedObjectOptions && (
+        {inspectedObject && (
           <div className="collapse-wrapper">
             <p className={`py-1 border-t pt-5 border-black px-5 font-semibold collapse-content-heading cursor-pointer`} onClick={toggleInputGroup}>
               <i className="bi bi-plus-square"></i>
@@ -137,13 +148,13 @@ export default function InspectorBar({ inspectedObject, inspectedObjectOptions, 
             </p>
             <div className="collapse-content hidden">
               <div className="py-1 border-t border-black px-5 flex">
-                <a href={`/tracking-label?id=${inspectedObject.id}`} className="w-full text-xs font-semibold hover:text-blue-400 hover:underline" onClick={openPopup}>View tracking label</a>
+                <a data-popupwidth="600" data-popupheight="450" href={`/tracking-label?id=${inspectedObject.id}`} className="w-full text-xs font-semibold hover:text-blue-400 hover:underline" onClick={openPopup}>View tracking label</a>
               </div>
               <div className="py-1 border-t border-black px-5 flex">
                 <p className="w-full text-xs font-semibold hover:text-blue-400 hover:underline cursor-pointer">View in 3D</p>
               </div>
               <div className="py-1 border-t border-black px-5 flex">
-                <p className="w-full text-xs font-semibold hover:text-blue-400 hover:underline cursor-pointer">Tracking Logs</p>
+                <a data-popupwidth="1100" data-popupheight="700" href={`/tracking-log?id=${inspectedObject.id}`} className="w-full text-xs font-semibold hover:text-blue-400 hover:underline" onClick={openPopup}>Tracking Logs</a>
               </div>
             </div>
           </div>
@@ -153,7 +164,7 @@ export default function InspectorBar({ inspectedObject, inspectedObjectOptions, 
 
         {/*    ASSET INVENTORY ON INSPECTOR BAR    */}
 
-        {!inspectedObjectOptions && (
+        {!inspectedObject && (
           <section className="flex flex-col gap-5 px-5">
             <div className="flex flex-col gap-2">
               <input className="bg-body/50 hover:bg-body/80 focus:bg-body/80 text-white ps-3 py-1 w-full outline-none rounded" type="text" placeholder="Search" value={searchValue} onChange={(e) => setSearchValue(e.target.value)} />

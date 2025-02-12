@@ -3,6 +3,12 @@ export const socket = io('http://localhost:3000');
 
 
 
+socket.on('auth_error', (data) => {
+  console.log(data);
+});
+
+
+
 export function fetchObjectsData() {
   socket.emit('objectsFetchReq');
 }
@@ -27,6 +33,6 @@ export function socketDeleteInspectedObject(deleteObjectId) {
 
 
 
-export function socketUpdateObject(updatedObject) {
-  socket.emit('updateObject', updatedObject);
+export function socketUpdateObject(updatedObject, moving = false, updateSingle = false, save = true) {
+  socket.emit('updateObject', updatedObject, moving, updateSingle, save);
 }

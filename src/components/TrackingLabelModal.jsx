@@ -52,7 +52,7 @@ export default function TrackingLabelModal() {
       <section className="flex flex-col gap-5 w-screen h-screen bg-black shadow-md rounded px-10 py-5 justify-start items-start">
         <section className="text-xl font-semibold uppercase">
           <h1>Inventory Label</h1>
-          <h2 className="text-base">{selectedObjectData.objectSN ? `${selectedObjectData.hardwareType} ${selectedObjectData.objectSN}` : selectedObjectData.objectName}</h2>
+          <h2 className="text-base">{selectedObjectData.objectSN ? `${selectedObjectData.hardwareType} ${selectedObjectData.objectSN.split('_')[1]}` : selectedObjectData.objectName.split('_')[1]}</h2>
         </section>
 
         <section className="flex h-min justify-center items-center">

@@ -11,18 +11,18 @@ import { camelToCapitalized, toggleInputGroup } from '../utils/utils.js';
 
 
 
-export default function NavigationBar() {
+export default function NavigationBar({ logout, user }) {
   const location = useLocation();
   let activeClasses = 'bg-body/50 text-blue-300';
 
 
-  return (
 
+  return (
 
     <section className="w-2/12 min-w-[320px] fixed h-full flex flex-col bg-primary z-20">
       <section className="text-xl font-semibold uppercase p-6 ">
         <h1>Starbase Portal</h1>
-        <h2 className="text-base">Rage</h2>
+        <h2 className="text-base">{user && user.username}</h2>
       </section>
 
       <section className="flex flex-col text-sm overflow-y-scroll h-screen">
@@ -67,7 +67,7 @@ export default function NavigationBar() {
         </div>
         <div className="collapse-wrapper">
           <p className="py-1 border-t border-black px-5 font-semibold collapse-content-heading">
-            <Link to="/prod" className="hover:text-blue-400 hover:underline w-full">Logout</Link>
+            <a className="hover:text-blue-400 hover:underline w-full cursor-pointer" onClick={logout}>Logout</a>
           </p>
         </div>
         <div className="collapse-wrapper">

@@ -42,7 +42,7 @@ export default function InventoryLabel1({ object, quantity=1 }) {
         break;
     }
 
-    return objectName != '' && object.objectSN != null ? `${objectName} ${objectName[0]}N${object.objectSN}` : object.objectName;
+    return objectName != '' && object.objectSN != null ? `${objectName} ${objectName[0]}N${object.objectSN.split('_')[1]}` : object.objectName.split('_')[1];
   }
 
 
@@ -96,7 +96,7 @@ export default function InventoryLabel1({ object, quantity=1 }) {
       <section className="flex">
         <div className="flex flex-col items-center justify-center me-8">
           <img src="./SpaceXLogoBlack.png" alt="SpaceX" />
-          <p className="text-center leading-5 tracking-wider mt-3 text-l">{object.hardwareOrigin} <br></br> {object.hardwareType} {['Ship', 'Booster'].includes(object.hardwareType) && 'Tribe$'}</p>
+          <p className="text-center leading-5 tracking-wider mt-3 text-l">{object.hardwareOrigin.split('_')[1]} <br></br> {object.hardwareType} {['Ship', 'Booster'].includes(object.hardwareType) && 'Tribe$'}</p>
         </div>
         <div className="flex flex-col">
           <div className="flex justify-between">

@@ -1,6 +1,6 @@
 //  React Hooks
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 
 
@@ -14,8 +14,13 @@ import { camelToCapitalized } from '../utils/utils.js';
 
 export default function InspectorBar({ inspectedObjectOption, setInspectedObjectOptionValue, optionDepth }) {
   let rawDefaultVal = inspectedObjectOption.optionValue.split('_')[1];
-
+  
   const [newOptionValue, setNewOptionValue] = useState(rawDefaultVal === "true" ? true : rawDefaultVal === "false" ? false : rawDefaultVal);
+
+
+  useEffect(() => {
+    setNewOptionValue(rawDefaultVal === "true" ? true : rawDefaultVal === "false" ? false : rawDefaultVal);
+  }, [rawDefaultVal]);
 
 
   function handleInspectedObjectOptionValueChange(e) {
