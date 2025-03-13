@@ -8,35 +8,82 @@ import { useAuth } from '../Authenticator.jsx';
 
 
 
-import { socket, fetchObjectDataFromId, socketUpdateObject } from '../utils/socketIOHandler.js';
+import { socket, socketUpdateObject } from '../utils/socketIOHandler.js';
+import { formatObjectNameText } from '../utils/utils.jsx';
+import TrackingLogMessage from '../components/TrackingLogMessage.jsx';
+import { Spinner } from '../components/Spinner.jsx';
 
 
 
 export default function TrackingLogModal() {
   const { user, logout } = useAuth();
 
+  const [pendingImages, setPendingImages] = useState([]);
+
   const [selectedObjectData, setSelectedObjectData] = useState(null);
+  const [filteredMessages, setFilteredMessages] = useState(null);
+
   const textareaRef = useRef(null);
+  const imageUploadRef = useRef(null);
 
   const [messageValue, setMessageValue] = useState('');
+  const [searchValue, setSearchValue] = useState('');
 
+  const [editing, setEditing] = useState(null);
+  
+
+
+  //    OBJECT FETCH    \\
 
   useEffect(() => {
-    const objId = new URLSearchParams(location.search).get('id');
-    if (!objId) { return; }
-    
-    fetchObjectDataFromId(objId);
-    
-    const handleRes = (data) => { setSelectedObjectData(data[0]); }
-    
-    socket.on('objectsFetchRes', handleRes);
-    
-    return () => { socket.off('objectsFetchRes', handleRes) }
+
+    // fetch object
+    const fetchObject = async () => {
+      try {
+        const objId = new URLSearchParams(location.search).get('id');
+        if (!objId) { return; }
+
+        const res = await fetch(`http://localhost:3002/objects/fetch-objects?id=${objId}`);
+        if (!res.ok) { throw new Error(res.statusText); }
+
+        const json = await res.json();
+        
+        setSelectedObjectData(json);
+      }
+      catch (error) {
+        console.error("Error handling fetchObject response");
+        console.error(error);
+      }
+    }
+
+
+    // update object
+    socket.on('updateThisObject', object => {
+      setSelectedObjectData((prevSelectedObjectData) => prevSelectedObjectData.id == object.id ? object : prevSelectedObjectData);
+    });
+
+
+    // error during socket request
+    socket.on('objectSocketRequestError', errObj => {
+      console.error(`Server error on '${errObj.action}'. Message: ${errObj.error_message}`);
+      console.error(errObj.error);
+    });
+
+
+    fetchObject();
+
+
+    return () => {
+      socket.off('updateThisObject');
+      socket.off('objectSocketRequestError');
+    }
   }, []);
 
 
 
-  function sendMessage() {
+  //    SEND MESSAGE    \\
+
+  function sendMessage(updatedLog) {
     const formattedMsgValue = messageValue.trim();
 
     // input validation
@@ -45,44 +92,137 @@ export default function TrackingLogModal() {
     // Add object
     let newSelectedObject = { ...selectedObjectData };
 
-    newSelectedObject.logs.push({
-      userId: user.id,
-      userName: user.username,
-      userAvatar: user.avatar,
-      messageBody: formattedMsgValue,
-      attachments: []
-    });
+    if (updatedLog) {
+      if (user.id != updatedLog.userId) { console.log("can't edit someone elses message"); return; }
 
-    socketUpdateObject(newSelectedObject, false, true);
+      newSelectedObject.logs = newSelectedObject.logs.map(log =>
+        log.id == updatedLog.id ?
+        { ...log, messageBody: formattedMsgValue, editedAt: Date.now() }
+        : log
+      );
+    }
+    else {
+      newSelectedObject.logs.push({
+        userId: user.id,
+        userName: user.username,
+        userAvatar: user.avatar,
+        messageBody: formattedMsgValue,
+        attachments: []
+      });
+    }
+
+
+    socketUpdateObject(newSelectedObject, { save: true });
+
 
     setMessageValue('');
+    textareaHeightFix();
+    setEditing(null);
   }
 
 
-  function deleteMessage(logId) {
+
+  //    EDIT MESSAGE    \\
+
+  function startEdit(log) {
+    if (user.id != log.userId) { console.log("can't edit someone elses message"); return; }
+
+    setMessageValue(log.messageBody);
+    textareaHeightFix();
+    setEditing(log);
+  }
+
+  function stopEdit(log) {
+    setMessageValue('');
+    textareaHeightFix();
+    setEditing(null);
+  }
+
+
+
+  //    DELETE MESSAGE    \\
+
+  function deleteMessage(logToDelete) {
+    if (user.id != logToDelete.userId) { console.log("can't delete someone elses message"); return; }
+
     let newLogsArr = [...selectedObjectData.logs];
-    const index = newLogsArr.findIndex(log => log.id == logId);
+    const index = newLogsArr.findIndex(log => log.id == logToDelete.id);
 
     if (index == -1) return;
 
     newLogsArr.splice(index, 1);
 
-    socketUpdateObject({ ...selectedObjectData, logs: newLogsArr }, false, true);
+    socketUpdateObject({ ...selectedObjectData, logs: newLogsArr }, { save: true });
   }
 
 
 
-  function handleInput(e) {
+  //    MESSAGE INPUT UTILS    \\
+
+  function textareaHeightFix() {
     const textarea = textareaRef.current;
 
-    textarea.style.height = 'auto';
-    textarea.style.height = `${textarea.scrollHeight}px`;
+    setTimeout(() => {
+      textarea.style.height = "auto";  
+      textarea.style.height = `${textarea.scrollHeight}px`;
+    }, 0);
+  }
 
+
+  function handleInput(e) {
     if (e.ctrlKey && e.key == 'Enter') {
       e.preventDefault();
 
-      sendMessage();
+      sendMessage(editing);
     }
+    else {
+      textareaHeightFix();
+    }
+  }
+
+
+
+  //    SEARCH    \\
+
+  useEffect(() => {
+    if (selectedObjectData && searchValue == '') { setFilteredMessages(selectedObjectData.logs); }
+    else if (selectedObjectData) { filterMessages(selectedObjectData.logs, searchValue); }
+  }, [selectedObjectData, searchValue]);
+
+
+  function filterMessages(logs, q) {
+    setFilteredMessages(logs.filter((log) => log.messageBody.toLowerCase().includes(q.trim().toLowerCase())));
+  }
+
+
+
+  //    MEDIA PROCESSING    \\
+
+  function imageInputHandler(e) {
+    console.log(e.target.files);
+    console.log(e.target.files.length);
+
+    if (e.target.files.length == 0) return;
+
+
+    Array.from(e.target.files).forEach((file) => {
+      if (file.size > (10 * 1024 * 1024)) { console.log("too big!"); return; }
+
+      // add image to list of pending images
+      setPendingImages((pendingImages) => [...pendingImages, {
+        id: Date.now(),
+        uploaded: false,
+        error: null,
+        private: false,
+        mediaType: '',
+        url: '',
+        tempURL: URL.createObjectURL(file),
+        fileName: file.name
+      }]);
+      
+      // send http post req to upload image
+      
+    });
   }
 
 
@@ -91,47 +231,60 @@ export default function TrackingLogModal() {
   return (
     <>
       <section className="flex flex-col h-screen overflow-hidden">
-        <div className="h-screen overflow-y-auto flex flex-col-reverse py-2 bg-primary">
+        <section className='bg-body border-b border-white/50 px-8 py-3 flex'>
+          <div className="w-10/12 mx-auto flex flex-col md:flex-row items-center">
+            <div className="w-full md:w-1/2">
+              <h1 className='text-l font-semibold uppercase break-words'>{searchValue ? `Results for '${searchValue}'` : selectedObjectData ? `Tracking Logs for '` + formatObjectNameText(selectedObjectData)[1] + "'" : ''}</h1>
+            </div>
+            <div className="w-full md:w-1/2 flex">
+              <input title='Ctrl+Enter to search' className="bg-primary/70 hover:bg-primary/80 focus:bg-primary/80 rounded-sm text-white py-1 px-3 w-full outline-0" placeholder='Search Logs...' maxLength={30} value={searchValue} onChange={(e) => setSearchValue(e.target.value)}></input>
+            </div>
+          </div>
+        </section>
+        
+
+        <div className="h-screen overflow-y-auto flex flex-col-reverse py-2 bg-body">
           <section className='flex flex-col justify-end'>
 
 
-            {selectedObjectData && selectedObjectData.logs.length > 0 && selectedObjectData.logs.map((log, index) => (
-                <section key={index} className="bg-primary px-5 py-3 flex relative border-b border-black">
-                  <div className="w-1/12 flex justify-center">
-                    <img className='w-[40px] h-[40px] rounded-full' src={`${log.avatar ? log.avatar : 'discord_logo.png'}`} alt="PFP" />
-                  </div>
-                  <div className="flex flex-col w-9/12 px-3">
-                    <p className='text-md text-gray-300'>{log.userName}</p>
-                    <div className="flex flex-col">
-                      {log.messageBody}
-                    </div>
-                  </div>
-
-                  <div className="absolute end-0 top-0 h-full w-2/12 pe-3 gap-2 flex justify-center items-center">
-                    <a className="ring-1 ring-white hover:bg-white hover:text-black w-[30px] h-[30px] flex justify-center items-center rounded cursor-pointer"><i className="bi bi-pencil flex"></i></a>
-                    <a className="ring-1 ring-white hover:bg-danger hover:text-white w-[30px] h-[30px] flex justify-center items-center rounded cursor-pointer" onClick={() => deleteMessage(log.id)}><i className="bi bi-trash flex"></i></a>
-                  </div>
-                </section>
+            {filteredMessages && filteredMessages.length > 0 && filteredMessages.map((log, index) => (
+                <TrackingLogMessage key={index} log={log} deleteMessage={deleteMessage} startEdit={startEdit} stopEdit={stopEdit} currentlyEditing={log == editing} userId={user.id} />
               ))
             }
 
-            {selectedObjectData && selectedObjectData.logs.length == 0 && (
-              <p className='text-center pb-5'>No logs yet.</p>
+            {filteredMessages && filteredMessages.length == 0 && (
+              <p className='text-center pb-5'>{searchValue == '' ? 'No logs yet.' : 'No results.'}</p>
             )}
 
 
           </section>
         </div>
 
-        <section className='bg-primary flex'>
-          <input className='hidden' type="file" name="" id="" />
-          <a className="h-full w-1/12 bg-body/50 hover:bg-body/20 cursor-pointer flex justify-center items-center">
+
+        {pendingImages.length > 0 && (
+          <section className="bg-primary/70 border-b border-white/50 flex h-[300px] overflow-x-auto overflow-y-hidden">
+            <div className="w-max flex p-2 gap-3">
+              {pendingImages.map((imgObj, index) => (
+                <div key={index} id={`pendingImage_${imgObj.id}`} className='aspect-square bg-primary p-4 rounded relative'>
+                  <div className="bg-body/60 absolute top-0 start-0 rounded flex items-center justify-center w-full h-full pointer-events-none">
+                    <Spinner />
+                  </div>
+                  <img className='w-full h-full object-contain' src={imgObj.tempURL} alt={imgObj.fileName} />
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+        
+        <section className='bg-primary/70 flex'>
+          <input className='hidden' multiple type="file" accept="image/png, image/gif, image/jpeg, image/jfif, image/webp, video/mp4, video/webm, video/x-matroska" ref={imageUploadRef} onChange={imageInputHandler} />
+          <a className="h-full w-1/12 hover:bg-body/20 cursor-pointer flex justify-center items-center" onClick={() => imageUploadRef.current.click()}>
             <i className="bi bi-plus-lg"></i>
           </a>
           
-          <textarea className="bg-body/50 text-white ps-3 py-3 w-full rounded-sm resize-none outline-0" rows="1" placeholder='Message...' maxLength={1000} value={messageValue} onChange={(e) => setMessageValue(e.target.value)} ref={textareaRef} onKeyDown={handleInput}></textarea>
+          <textarea title='Ctrl+Enter to send' className="bg-transparent text-white ps-3 py-3 w-full resize-none outline-0 overflow-hidden" rows="1" placeholder='Message...' maxLength={1000} value={messageValue} onChange={(e) => setMessageValue(e.target.value)} ref={textareaRef} onKeyDown={handleInput}></textarea>
 
-          <a className="h-full w-1/12 bg-body/50 hover:bg-body/20 cursor-pointer flex justify-center items-center" onClick={sendMessage}>
+          <a className="h-full w-1/12 hover:bg-body/20 cursor-pointer border-s border-white/50 flex justify-center items-center" onClick={() => sendMessage(editing)}>
             <i className="bi bi-send"></i>
           </a>
         </section>

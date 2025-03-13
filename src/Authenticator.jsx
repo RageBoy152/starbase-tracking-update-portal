@@ -25,7 +25,7 @@ export function AuthProvider({ children }) {
 
     const checkAuth = async () => {
       try {
-        const response = await fetch('http://localhost:3002/auth/check', {
+        const response = await fetch(`http://localhost:3002/auth/check?socketId=${socket.id}`, {    ///   SOCKET.ID IS NOT DEFINED HERE COZ WE HAVEN'T CONNECTED YET - NEED TO WRAP AUTHENTICATOR IN SOCKET USE CONTEXT
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -33,43 +33,45 @@ export function AuthProvider({ children }) {
           credentials: 'include'
         });
 
+        
+        if (!response.ok) {
+          // print errors if res isn't 200
+          setMessage(response.statusText);
+          setErr(response.status);
+          console.log(response);
+          
+          setLoading(false);
+          return;
+        }
+
+
         // parse res data
         const userData = await response.json();
-
-        if (!response.ok) {
+        
+        if (userData.error) {
           // print errors if res isn't 200
           setMessage(userData.message);
           setErr(userData.error);
           console.error(userData);
 
           setLoading(false);
+          return;
         }
-        else {
-          // set user data from res
-          setUser(userData);
-          setLoading(false);
 
-          socket.emit('authenticate', userData.id);
-        }
+        // set user data from res
+        setUser(userData);
+        setLoading(false);
 
       } catch (error) {
         // print errors if error in fetch
         setMessage('Error checking validity of session.');
         setErr(error.toString());
         console.error(error);
-
-        // setUser(null);
       }
     };
 
-    checkAuth();
 
-
-
-
-
-    //    OAUTH WEBSOCKETS    \\
-    
+    socket.on('connect', checkAuth);
     socket.on('oauth_url', (url) => window.location.href = url);
 
 
@@ -78,6 +80,7 @@ export function AuthProvider({ children }) {
 
     return () => {
       socket.off('oauth_url');
+      socket.off('connect');
     };
 
   }, []);
@@ -86,7 +89,7 @@ export function AuthProvider({ children }) {
   const login = () => { socket.emit('request_oauth', 'http://localhost:5173/auth/callback'); }
   const logout = () => {
     
-    fetch('http://localhost:3002/auth/logout', { credentials: 'include' })
+    fetch(`http://localhost:3002/auth/logout?socketId=${socket.id}`, { credentials: 'include' })
     .then(async (res) => {
       // get logout req result
       let resData = await res.json();

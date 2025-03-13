@@ -3,20 +3,14 @@ export const socket = io('http://localhost:3000');
 
 
 
-socket.on('auth_error', (data) => {
-  console.log(data);
-});
-
-
-
-export function fetchObjectsData() {
-  socket.emit('objectsFetchReq');
+export function fetchChopstickData(chopstickId) {
+  socket.emit('chopstickFetchReq', chopstickId);
 }
 
 
 
-export function fetchObjectDataFromId(id) {
-  socket.emit('objectFetchFromIdReq', id);
+export function updateChopstickData(chopstickData, saveToDB) {
+  socket.emit('updateChopstickData', chopstickData, saveToDB);
 }
 
 
@@ -27,12 +21,12 @@ export function socketAddNewObject(newObject) {
 
 
 
-export function socketDeleteInspectedObject(deleteObjectId) {
-  socket.emit('deleteObject', deleteObjectId);
+export function socketDeleteObject(id) {
+  socket.emit('deleteObject', id);
 }
 
 
 
-export function socketUpdateObject(updatedObject, moving = false, updateSingle = false, save = true) {
-  socket.emit('updateObject', updatedObject, moving, updateSingle, save);
+export function socketUpdateObject(updatedObject, options) {
+  socket.emit('updateObject', updatedObject, options);
 }

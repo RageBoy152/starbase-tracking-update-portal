@@ -2,25 +2,34 @@ import { useLocation } from "react-router-dom";
 import { useEffect } from "react";
 
 
-import { socket, fetchObjectDataFromId } from "../utils/socketIOHandler";
-
 
 export default function ToObject() {
   const location = useLocation();
-  const id = new URLSearchParams(location.search).get('id');
 
 
+  
   useEffect(() => {
-    fetchObjectDataFromId(id);
 
-    const handleRes = (data) => {
-      if (!data[0]) { return; }
+    // fetch object
+    const fetchObject = async () => {
+      try {
+        const objId = new URLSearchParams(location.search).get('id');
+        if (!objId) { return; }
 
-      window.location.href = `${window.location.origin}/${data[0].hardwareOnMap}?id=${id}`;
+        const res = await fetch(`http://localhost:3002/objects/fetch-objects?id=${objId}`);
+        if (!res.ok) { throw new Error(res.statusText); }
+
+        const json = await res.json();
+        
+        window.location.href = `${window.location.origin}/${json.hardwareOnMap}?id=${objId}`;
+      }
+      catch (error) {
+        console.error("Error handling fetchObject response");
+        console.error(error);
+      }
     }
 
-    socket.on('objectsFetchRes', handleRes);
 
-    return () => { socket.off('objectsFetchRes', handleRes) }
-  }, [id]);
+    fetchObject();
+  }, []);
 }

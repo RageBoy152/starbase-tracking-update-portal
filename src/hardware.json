@@ -19,7 +19,7 @@
             "fwdFlap": "number_0_0_2_1",
             "fwdFlapAerocover": "number_0_0_2_1",
             "TPS": "slider_0_0_1_0.1",
-            "Internal": "slider_0_0_1_0.1"
+            "internals": "slider_0_0_1_0.1"
           },
           "PL:3": {
             "barrelRings": "number_3_0_3_1",

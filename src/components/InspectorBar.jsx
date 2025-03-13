@@ -6,11 +6,11 @@ import InspectorOption from "./InspectorOption"
 
 
 import React, { useState, useEffect, useRef } from "react"
-import { camelToCapitalized, copyText, toggleInputGroup } from '../utils/utils.js';
+import { camelToCapitalized, copyText, toggleInputGroup, formatObjectNameText } from '../utils/utils.jsx';
 
 
 
-export default function InspectorBar({ inspectedObject, setInspectedObjectOptionValue, objectTemplates, deleteInspectedObject }) {
+export default function InspectorBar({ inspectedObject, setInspectedObjectOptionValue, objectTemplates, deleteObject }) {
 
   const inspectorBarCopyLinkRef = useRef();
 
@@ -24,21 +24,23 @@ export default function InspectorBar({ inspectedObject, setInspectedObjectOption
 
   //    OBJECT OPTION FIELDS    \\
 
-  function spawnInspectorOption(object, depth=0) {
+  function spawnInspectorOption(object, path=[], depth=0) {
     // extract exposed props from object
     const { objectSN, hardwareOrigin, objectName, zIndex, options, ...rest } = object;
 
+    
     // merge extracted props
-    const mergedOptions = { objectSN, hardwareOrigin, objectName, zIndex, ...(options || {}) };
-
+    const mergedOptions = depth == 0 ? { objectSN, hardwareOrigin, objectName, zIndex, ...(options || {}) } : object;
+    
 
     // loop through options object
     return Object.keys(mergedOptions).map((optionKey, index) => {
 
       // get option value and check if its an object
       let val = mergedOptions[optionKey];
-      let isObj = val && typeof val === "object" && !Array.isArray(val);
+      let isObj = val && typeof val === "object"; //  && !Array.isArray(val)
 
+      const newPath = [...path, optionKey];
 
       if (isObj) {
         // loop through options > options object
@@ -50,7 +52,7 @@ export default function InspectorBar({ inspectedObject, setInspectedObjectOption
                 {camelToCapitalized(optionKey)}
               </p>
               <div className="collapse-content hidden">
-                {spawnInspectorOption(val, depth+1)}
+                {spawnInspectorOption(val, newPath, depth+1)}
               </div>
             </div>
           </React.Fragment>
@@ -58,9 +60,9 @@ export default function InspectorBar({ inspectedObject, setInspectedObjectOption
       }
       else {
         // end of chain, add option to DOM
-        // console.log(optionKey, val);
+
         return (
-          <InspectorOption optionDepth={depth} key={optionKey} inspectedObjectOption={{optionName: optionKey, optionValue: val ?? ""}} setInspectedObjectOptionValue={setInspectedObjectOptionValue} />
+          <InspectorOption optionDepth={depth} key={optionKey} inspectedObjectOption={{ optionPath: path, optionName: optionKey, optionValue: val ?? "" }} setInspectedObjectOptionValue={setInspectedObjectOptionValue} />
         )
       }
     });
@@ -115,7 +117,7 @@ export default function InspectorBar({ inspectedObject, setInspectedObjectOption
 
       {/*    INSPECTOR BAR HEADING    */}
       <section className="text-xl font-semibold uppercase p-6 ">
-        <h1>{inspectedObject ? inspectedObject.objectSN != null ? `${inspectedObject.hardwareType} ${inspectedObject.objectSN.split('_')[1]}` : inspectedObject.objectName.split('_')[1] : 'Asset Inventory'}</h1>
+        <h1>{inspectedObject ? formatObjectNameText(inspectedObject)[1] : 'Asset Inventory'}</h1>
         <h2 className="text-base">{inspectedObject ? 'Inspector' : 'Add Hardware'}</h2>
       </section>
 
@@ -125,8 +127,8 @@ export default function InspectorBar({ inspectedObject, setInspectedObjectOption
       {inspectedObject && (
         <section className="flex justify-start items-center pb-7 px-7 gap-3">
           <a ref={inspectorBarCopyLinkRef} className="ring-1 ring-white hover:bg-white hover:text-black w-[40px] aspect-square flex justify-center items-center rounded cursor-pointer" onClick={() => copyText(`${location.origin}/to-object?id=${inspectedObject.id}`, inspectorBarCopyLinkRef.current)}><i className="bi bi-link-45deg flex"></i></a>
-          <a className="ring-1 ring-white hover:bg-danger w-[40px] aspect-square flex justify-center items-center rounded cursor-pointer" onClick={deleteInspectedObject}><i className="bi bi-trash flex"></i></a>
-          <a ref={inspectorBarCopyLinkRef} className="ring-1 ring-white hover:bg-white hover:text-black w-[40px] aspect-square flex justify-center items-center rounded cursor-pointer ms-auto"><i className="bi bi-arrow-right flex"></i></a>
+          <a className="ring-1 ring-white hover:bg-danger w-[40px] aspect-square flex justify-center items-center rounded cursor-pointer" onClick={() => { deleteObject(inspectedObject.id); }}><i className="bi bi-trash flex"></i></a>
+          <a className="ring-1 ring-white hover:bg-white hover:text-black w-[40px] aspect-square flex justify-center items-center rounded cursor-pointer ms-auto"><i className="bi bi-arrow-right flex"></i></a>
         </section>
       )}
 
@@ -134,7 +136,7 @@ export default function InspectorBar({ inspectedObject, setInspectedObjectOption
 
       {/*    INSPECTOR OPTIONS    */}
 
-      <section className={`flex flex-col text-sm overflow-y-scroll pb-9`}>
+      <section className={`flex flex-col text-sm overflow-y-auto pb-9`}>
         {inspectedObject && spawnInspectorOption(inspectedObject)}
 
 
@@ -171,7 +173,7 @@ export default function InspectorBar({ inspectedObject, setInspectedObjectOption
               <p className="text-xs px-1">{searchValue ? `${filteredObjectTemplates.length} Results.` : '⠀'}</p>
             </div>
 
-            <div className="text-black text-center font-bold uppercase leading-4 w-full flex justify-between px-7">
+            <div className="text-black text-center font-bold uppercase leading-4 w-full flex flex-wrap gap-5 justify-between px-7">
               
               {filteredObjectTemplates.map((objectTemplateKey, index) => (
                 <div data-object-template-key={objectTemplateKey} key={objectTemplateKey} className={`draggableObject cursor-pointer rounded-full w-[90px] h-[90px] object bg-${objectTemplateKey.toLowerCase().includes('spot') ? 'yellow-300' : 'green-500'}`}>

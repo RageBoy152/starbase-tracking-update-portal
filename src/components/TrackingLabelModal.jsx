@@ -11,11 +11,11 @@ import InventoryLabel1 from "./InventoryLabel1";
 // import hardware from '../hardware.json';
 // import spots from '../spots.json';
 
-import { socket, fetchObjectDataFromId } from '../utils/socketIOHandler.js';
+import { socket } from '../utils/socketIOHandler.js';
 
 
 
-import { copyText } from '../utils/utils.js';
+import { copyText } from '../utils/utils.jsx';
 // import html2canvas from "html2canvas";
 
 
@@ -26,26 +26,42 @@ export default function TrackingLabelModal() {
   const location = useLocation();
   
   const [selectedObjectData, setSelectedObjectData] = useState(null);
-  
-  useEffect(() => {
-    const objId = new URLSearchParams(location.search).get('id');
-    if (!objId) { return; }
-    
-    fetchObjectDataFromId(objId);
-    
-    const handleRes = (data) => { setSelectedObjectData(data[0]); }
-    
-    socket.on('objectsFetchRes', handleRes);
-    
-    return () => { socket.off('objectsFetchRes', handleRes) }
-  }, []);
-  
 
+
+
+  useEffect(() => {
+
+    // fetch object
+    const fetchObject = async () => {
+      try {
+        const objId = new URLSearchParams(location.search).get('id');
+        if (!objId) { return; }
+
+        const res = await fetch(`http://localhost:3002/objects/fetch-objects?id=${objId}`);
+        if (!res.ok) { throw new Error(res.statusText); }
+
+        const json = await res.json();
+        
+        setSelectedObjectData(json);
+      }
+      catch (error) {
+        console.error("Error handling fetchObject response");
+        console.error(error);
+      }
+    }
+
+
+    fetchObject();
+  }, []);
+
+  
 
   //  FIND YT TUT ON THIS
   function downloadLabel() {
     
   }
+
+
 
   return (selectedObjectData && (
     <>

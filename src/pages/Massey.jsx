@@ -16,7 +16,6 @@ export default function Massey() {
   return (
     <>
       <NavigationBar />
-      {/* <InspectorBar inspectedObject={inspectedObject} inspectedObjectOptions={inspectedObjectOptions} setInspectedObjectOptionValue={setInspectedObjectOptionValue} /> */}
     </>
   )
 }

@@ -8,11 +8,11 @@ import { useEffect, useState } from "react"
 
 
 
-import { camelToCapitalized } from '../utils/utils.js';
+import { camelToCapitalized } from '../utils/utils.jsx';
 
 
 
-export default function InspectorBar({ inspectedObjectOption, setInspectedObjectOptionValue, optionDepth }) {
+export default function InspectorOption({ inspectedObjectOption, setInspectedObjectOptionValue, optionDepth }) {
   let rawDefaultVal = inspectedObjectOption.optionValue.split('_')[1];
   
   const [newOptionValue, setNewOptionValue] = useState(rawDefaultVal === "true" ? true : rawDefaultVal === "false" ? false : rawDefaultVal);
@@ -28,8 +28,8 @@ export default function InspectorBar({ inspectedObjectOption, setInspectedObject
   }
 
 
-  function handleInspectedObjectOptionValueInputKeyDown(e, ctrlRequired) { if (e.key == "Enter" && (ctrlRequired && e.ctrlKey)) { setInspectedObjectOptionValue(inspectedObjectOption.optionName, newOptionValue); } }
-  function handleInspectedObjectOptionFieldSubmit(e) { setInspectedObjectOptionValue(inspectedObjectOption.optionName, e.target.type === "checkbox" ? e.target.checked : e.target.value); }
+  function handleInspectedObjectOptionValueInputKeyDown(e, ctrlRequired) { if (e.key == "Enter" && (ctrlRequired && e.ctrlKey)) { setInspectedObjectOptionValue(inspectedObjectOption.optionPath, inspectedObjectOption.optionName, newOptionValue); } }
+  function handleInspectedObjectOptionFieldSubmit(e) { setInspectedObjectOptionValue(inspectedObjectOption.optionPath, inspectedObjectOption.optionName, e.target.type === "checkbox" ? e.target.checked : e.target.value); }
 
   
 

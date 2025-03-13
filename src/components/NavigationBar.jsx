@@ -7,7 +7,7 @@ import { Link, useLocation } from "react-router-dom";
 
 
 
-import { camelToCapitalized, toggleInputGroup } from '../utils/utils.js';
+import { camelToCapitalized, toggleInputGroup } from '../utils/utils.jsx';
 
 
 
@@ -25,7 +25,7 @@ export default function NavigationBar({ logout, user }) {
         <h2 className="text-base">{user && user.username}</h2>
       </section>
 
-      <section className="flex flex-col text-sm overflow-y-scroll h-screen">
+      <section className="flex flex-col text-sm overflow-y-auto h-screen">
         
         <div className="collapse-wrapper">
           <p className={`py-1 border-t border-black px-5 font-semibold collapse-content-heading ${location.pathname == '/prod' && activeClasses}`} onClick={toggleInputGroup}>
@@ -38,11 +38,22 @@ export default function NavigationBar({ logout, user }) {
             <i className="bi bi-plus-square"></i>
             <Link to="/lc" className="hover:text-blue-400 hover:underline w-1/2">Launch Site</Link>
           </p>
-          <div className={`collapse-content ${!['/pad', '/otf'].includes(location.pathname) && 'hidden'}`}>
+          <div className={`collapse-content ${!['/pad', '/otf', '/chopsticks'].includes(location.pathname) && 'hidden'}`}>
 
-            <div className={`py-1 border-t border-black px-7 pe-5 flex inspector-option-field ${location.pathname == '/pad' && location.search == '?pad=a' && activeClasses}`}>
-              <Link to="/pad?pad=a" className="hover:text-blue-400 hover:underline font-semibold w-full">Pad A</Link>
+            <div className="collapse-wrapper">
+              <p className={`py-1 border-t border-black px-7 font-semibold collapse-content-heading cursor-pointer ${location.pathname == '/pad' && location.search == '?pad=a' && activeClasses}`} onClick={toggleInputGroup}>
+                <i className="bi bi-plus-square"></i>
+                <Link to="/pad?pad=a" className="hover:text-blue-400 hover:underline w-1/2">Pad A</Link>
+              </p>
+              <div className={`collapse-content ${!['/chopsticks'].includes(location.pathname) && 'hidden'}`}>
+                
+                <div className={`py-1 border-t border-black px-10 pe-5 flex inspector-option-field ${location.pathname == '/chopsticks' && location.search == '?pad=a' && activeClasses}`}>
+                  <Link to="/chopsticks?id=93cc30a2-71a5-40d0-850e-014fc6e92fa0" className="hover:text-blue-400 hover:underline font-semibold w-full">Chopsticks</Link>
+                </div>
+
+              </div>
             </div>
+
             <div className={`py-1 border-t border-black px-7 pe-5 flex inspector-option-field ${location.pathname == '/pad' && location.search == '?pad=b' && activeClasses}`}>
               <Link to="/pad?pad=b" className="hover:text-blue-400 hover:underline font-semibold w-full">Pad B</Link>
             </div>
@@ -56,6 +67,12 @@ export default function NavigationBar({ logout, user }) {
         <div className="collapse-wrapper">
           <p className={`py-1 border-t border-black px-5 font-semibold collapse-content-heading ${location.pathname == '/massey' && activeClasses}`}>
             <Link to="/massey" className="hover:text-blue-400 hover:underline w-full">Massey's</Link>
+          </p>
+        </div>
+
+        <div className="collapse-wrapper">
+          <p className={`py-1 border-t border-black px-5 font-semibold collapse-content-heading ${location.pathname == '/users' && activeClasses}`}>
+            <Link to="/users" className="hover:text-blue-400 hover:underline w-full">Users</Link>
           </p>
         </div>
 

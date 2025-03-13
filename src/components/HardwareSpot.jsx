@@ -3,7 +3,7 @@ import React, { useEffect, useState, useRef } from "react";
 
 
 //  React Compontents
-
+import { formatObjectNameText } from '../utils/utils.jsx';
 
 
 
@@ -18,6 +18,7 @@ export const HardwareSpot = React.memo(({ object, setInspectedObject, updateObje
   const objectMoveSpeed = 1;
 
   const [newPos, setNewPos] = useState({ x: object.position.x, y: object.position.y });
+
 
 
   useEffect(() => {
@@ -41,7 +42,7 @@ export const HardwareSpot = React.memo(({ object, setInspectedObject, updateObje
     if (armSetInspect) { setInspectedObject(object); }
 
     // save position of object on mouse up
-    updateObject(object.id, newPos.x, newPos.y, true, true);  // set "moving" and "save" flags to true
+    updateObject(object.id, newPos.x, newPos.y, true, true);
 
     draggingObjectId.current = null;
     e.currentTarget.style.zIndex = object.zIndex.split('_')[1];
@@ -71,7 +72,7 @@ export const HardwareSpot = React.memo(({ object, setInspectedObject, updateObje
         lastUpdateTime.current = currentTime;
 
         // tell backend to update object for other clients
-        updateObject(object.id, newX, newY, true, false);  // "movement"=true; "save"=false
+        updateObject(object.id, newX, newY, true, false);
       }
 
       // set new pos x,y
@@ -81,27 +82,6 @@ export const HardwareSpot = React.memo(({ object, setInspectedObject, updateObje
   }
 
 
-
-  function formatHardwareBarrelText() {
-    let hardwareBarrelText = '';
-    let barrelCount = parseInt(object.options.barrels.split('_')[1]);
-
-    if (barrelCount != 6 && barrelCount != 0) {
-      let totalBarrels = 0;
-
-      Object.keys(object.options.barrelConfig).forEach((barrel, index) => {
-        if (object.options.barrelConfig[barrel].barrelRings == null || index > barrelCount) { return; }
-
-        totalBarrels += parseInt(object.options.barrelConfig[barrel].barrelRings.split('_')[3]);
-      });
-
-      hardwareBarrelText = `N:${totalBarrels}`;
-    }
-    else if (barrelCount == 0) { hardwareBarrelText = 'NC' }
-
-    return hardwareBarrelText;
-  }
-
   
 
   return (
@@ -109,18 +89,7 @@ export const HardwareSpot = React.memo(({ object, setInspectedObject, updateObje
       <div onMouseDown={handleMouseDown} onMouseUp={handleMouseUp} onMouseMove={handleMouseMove} data-object-id={object.id} className={`z-[${object.zIndex.split('_')[1]}] cursor-pointer rounded-full w-[90px] h-[90px] object ${object.status == 'spot' ? 'bg-yellow-300' : `bg-green-500${object.status == 'faded' ? '/70' : ''}`}`}>
         <div className="flex flex-col h-full justify-center">
           {/* {object.status == 'spot' && (<a className="text-xxl flex justify-center items-center h-full"><i className="bi bi-plus"></i></a>)} */}
-          {object.objectName.split('_')[1] == '' && (
-            <>
-              <p>{object.objectSN != null ? `${object.hardwareType} ${object.objectSN.split('_')[1]}` : ''}</p>
-              <p>{object.options.barrels != null && formatHardwareBarrelText()}</p>
-            </>
-          )}
-
-          {object.objectName.split('_')[1] !== '' &&
-            object.objectName.split('_')[1].split("\n").map((line, index) => (
-              <p key={index}>{line}</p>
-            ))
-          }
+          {formatObjectNameText(object)[0]}
         </div>
       </div>
 
